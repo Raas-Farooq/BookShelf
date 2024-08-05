@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.get('/EffortTest', controller.getAll);
-router.get('/privilege', controller.addBook);
+router.post('/addBook', controller.addBook);
 
 
 export default router;

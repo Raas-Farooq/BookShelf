@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 const booksSchema = new mongoose.Schema({
     myId:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     title:{
         type:String,
@@ -24,6 +25,7 @@ const booksSchema = new mongoose.Schema({
 
 })
 
+booksSchema.index({myId:1},{unique:true})
 
 const booksModel = mongoose.model('booksModel', booksSchema);
 

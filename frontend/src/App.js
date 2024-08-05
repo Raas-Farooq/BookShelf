@@ -11,18 +11,18 @@ function App() {
       response => response.json()
     ).then
     (data => {
-      console.log("this is YOUR Effort :", data)
+      console.log("this is YOUR Effort :", data);
     }).catch(err => console.log("error Caught: ",err ))
   }
 
     const handleAddBook = () => {
 
       const newBook = {
-        myId:'3sldkfoeu3',
-        title:'Awaken Giant',
-        Authors:['Anthony Robbins'],
-        year:'1990',
-        publisher:'Books & Books'
+        myId:',xn3ei4eeUUF',
+        title:'Effort In Deen and Dunya',
+        authors:['Raas '],
+        year:'2040',
+        publisher:'Khanum & Co'
 
       }
 
