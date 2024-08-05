@@ -18,8 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "frontend": "react-scripts start",
-    "backend": "nodemon src/backend/server.js",
+    "frontend": "cd frontend && npm start",
+    "backend": "cd backend && nodemon server.js",
     "dev" : "concurrently \"npm run frontend\" \"npm run backend\" ", 
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -30,6 +30,12 @@
       "react-app/jest"
     ]
   },
+  "json.schemas": [
+    {
+      "fileMatch": ["package.json"],
+      "url": ""
+    }
+  ],
   "browserslist": {
     "production": [
       ">0.2%",

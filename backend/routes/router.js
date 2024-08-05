@@ -5,8 +5,8 @@ import controller from '../controllers/controller.js';
 const router = express.Router();
 
 
-router.get('/EffortTest', controller.EffortTest);
-router.get('/privilege', controller.privilege);
+router.get('/EffortTest', controller.getAll);
+router.get('/privilege', controller.addBook);
 
 
 export default router;

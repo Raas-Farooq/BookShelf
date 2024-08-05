@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import database from './db/database.js';
 import router from './routes/router.js';
+import booksData from './fetchData/booksData.js';
+
 
 const app = express();
 
@@ -18,8 +20,8 @@ database().then
 
 app.use('/bookish/api', router);
 
-
-
+// const books = booksData();
+// console.log("books: ", books)
 app.use((err,req, res, next) => {
     console.log(err.stack);
     res.status(500).send("something causing trouble ")

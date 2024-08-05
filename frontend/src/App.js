@@ -15,9 +15,24 @@ function App() {
     }).catch(err => console.log("error Caught: ",err ))
   }
 
-    const handlePrivilege = () => {
+    const handleAddBook = () => {
 
-      fetch('http://localhost:3005/bookish/api/privilege').
+      const newBook = {
+        myId:'3sldkfoeu3',
+        title:'Awaken Giant',
+        Authors:['Anthony Robbins'],
+        year:'1990',
+        publisher:'Books & Books'
+
+      }
+
+      fetch('http://localhost:3005/bookish/api/addBook', {
+        method:'POST',
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(newBook)
+      }).
       then(response => response.json()).
       then(data => {
         console.log("Secret : ", data)
@@ -29,7 +44,7 @@ function App() {
       <h2> Books Our Life</h2>
 
       <button onClick={(e) => makeRequest(e) } > BakcendRequest</button>
-      <button onClick={handlePrivilege}> Privilege</button>
+      <button onClick={handleAddBook}> Privilege</button>
     </div>
   );
 }
