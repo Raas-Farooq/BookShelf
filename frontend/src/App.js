@@ -5,8 +5,13 @@ import { useEffect, useState } from 'react';
 
 function App() {
 
-  const makeRequest = (e) => {
-    e.preventDefault();
+
+  useEffect(() => {
+    makeRequest();
+  },[])
+
+  const makeRequest = () => {
+    
     console.log("Im going to makerequest");
 
     fetch('http://localhost:3005/bookish/api/effortTest').then(
@@ -24,8 +29,8 @@ function App() {
         myId:',eur343',
         title:'Strength and Weaknesses',
         authors:['Raas '],
-        year:'2022',
-        publisher:'Khanum & Co'
+        publisher:'Khanum & Co',
+        imageLink:'http://books.google.com/books/content?id=5c8Scnnvi84C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
 
       }
 
@@ -104,7 +109,7 @@ function App() {
     }
 
     function handleDelete(){
-      const id = '3M7AzQEACAAJ';
+      const id = '66b071892ab1d551ae9b011c';
 
       if(!id || (typeof(id) !== "string")){
         console.log("ID Shouldn't Empty or must be String");
@@ -122,15 +127,11 @@ function App() {
           console.log("data response on Delete Route ", data);
         }
         else{
-          console.log("Error message: ", data.message)
+          console.log("Error message: ", data)
         }
         
       }).catch(err => console.log("this is the Err while deleting the Book:", err))
     }
-    // useEffect(() => {
-      
-    // },[])
-
 
   return (
     <div className="App">
