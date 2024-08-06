@@ -15,12 +15,13 @@ const getAll = async (req, res) => {
         const apiBooks = booksFromApi?.items || [];
   
         books = apiBooks.map(book => ({
-          myId: book.id,
-          title: book.volumeInfo.title,
-          authors: book.volumeInfo.authors || [],
-          year: book.volumeInfo.publishedDate || 0,
-          publisher: book.volumeInfo.publisher || '',
-        }));
+            myId: book.id,
+            title: book.volumeInfo.title,
+            imageLink: book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.thumbnail || book.volumeInfo.imageLinks.smallThumbnail : '',
+            authors: book.volumeInfo.authors || [],
+            year: book.volumeInfo.publishedDate || 0,
+            publisher: book.volumeInfo.publisher || '',
+          }));
   
         if (books.length > 0) {
            
@@ -29,9 +30,11 @@ const getAll = async (req, res) => {
         }
       }
       if (books.length > 0) {
-        // removeDuplicates();
-        console.log("Successfully sent the response");
-        res.status(200).json(books);
+        res.status(200).json({
+          success:true,
+          message:"successfully Accessed the Books Data",
+          books
+        });
       } else {
         res.status(404).json({ message: "No Books Found" });
       }
@@ -129,12 +132,34 @@ const addBook = async (req, res) => {
   async function deleteBook(req, res){
     try{
       const id = req.query.id;
-      const isExist = await booksModel.findOne({id: myId});
-      console.log("is Exist; ", isExist);
-      res.status(201).json({
-        success:true,
-        message:"successfully Received the Id"
-      })
+      console.log("id after repeated errs: ", id);
+      const isExist = await booksModel.findOne({myId:id});
+      
+      if(!isExist){
+        
+        return res.status(404).json({
+          success:false,
+          message:"Book didnt exist",
+          books:googleBooks
+        })
+      }
+
+
+      const del = await booksModel.deleteOne(isExist);
+      console.log('del ', del);
+      if(del.deletedCount){
+        return res.status(201).json({
+          success:true,
+          message:"successfully Remove the Book"
+        })
+      }
+      else{
+        return res.status(404).json({
+          success:false,
+          message:"Book Exist but Not Able to Delete the Book"
+        })
+      }
+      
     }catch(err){
 
       console.log("err while fetching Id");

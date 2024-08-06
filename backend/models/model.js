@@ -15,12 +15,11 @@ const booksSchema = new mongoose.Schema({
         type:Array,
         required:true
     },
-    year:{
-        type:String
-    },
     publisher:{
         type:String
-        
+    },
+    imageLink:{
+        type:String
     }
 
 })
