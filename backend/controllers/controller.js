@@ -1,41 +1,12 @@
 import Books from "../fetchData/booksData.js";
 import booksModel from '../models/model.js';
+import { body, param, validationResult } from "express-validator";
 
 
-const removeDuplicates = async () => {
-    try {
-      const result = await booksModel.aggregate([
-        // Group by myId
-        { $group: {
-            _id: "$myId",
-            dups: { $addToSet: "$_id" },
-            count: { $sum: 1 }
-        }},
-        // Filter where count is greater than 1
-        { $match: { count: { $gt: 1 } } },
-        // Keep only the first document in each group
-        { $project: {
-            _id: 0,
-            toKeep: { $first: "$dups" },
-            toRemove: { $slice: ["$dups", 1, { $subtract: ["$count", 1] }] }
-        }}
-      ]);
-  
-      // Remove the duplicate documents
-      for (let doc of result) {
-        await booksModel.deleteMany({ _id: { $in: doc.toRemove } });
-      }
-  
-      console.log(`Removed ${result.reduce((sum, doc) => sum + doc.toRemove.length, 0)} duplicate documents`);
-    } catch (err) {
-      console.error("Error removing duplicates:", err);
-    }
-  };
-
-  
 const getAll = async (req, res) => {
     try {
         
+
       let books = await booksModel.find({}).sort({ myId: 1 });
   
       if (books.length === 0) {
@@ -47,7 +18,7 @@ const getAll = async (req, res) => {
           myId: book.id,
           title: book.volumeInfo.title,
           authors: book.volumeInfo.authors || [],
-          year: book.volumeInfo.publishedDate || '',
+          year: book.volumeInfo.publishedDate || 0,
           publisher: book.volumeInfo.publisher || '',
         }));
   
@@ -57,30 +28,8 @@ const getAll = async (req, res) => {
           console.log("Books inserted into database");
         }
       }
-  
       if (books.length > 0) {
         // removeDuplicates();
-        let i = 0;
-        let finalList = [];
-        while(i < books.length){
-            const myTitle = books[i].title || '';
-            console.log("myTitle: ", myTitle)
-            i++;
-            if(!myTitle){
-                console.log("myTitle is Null: ")
-            }
-            else{
-                for (const book of books){
-                    if(book.title === myTitle){
-                        finalList.push(book);
-                    }
-                }
-            }
-            
-        }
-        console.log("this is teh Unique List: ", finalList.length);
-        
-
         console.log("Successfully sent the response");
         res.status(200).json(books);
       } else {
@@ -91,6 +40,7 @@ const getAll = async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   };
+
 
 const addBook = async (req, res) => {
     try {
@@ -123,4 +73,78 @@ const addBook = async (req, res) => {
     }
   };
 
-export default {getAll, addBook}
+  const validateBookEdit = [
+    param('id').isString().notEmpty().withMessage('Valid book ID is required'),
+    body('updatedTitle').isString().notEmpty().withMessage('Title is required'),
+    body('updatedAuthors').isArray().withMessage('Authors should be an array'),
+    body('updatedAuthors.*').isString().withMessage('Each author should be a string'),
+    body('newYear').isInt({ min: 1000, max: new Date().getFullYear() }).withMessage('Valid year is required'),
+  ];
+
+  const editBook = async(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+      return res.status(404).json({erros:errors.array()})
+    }
+
+
+    try{
+
+      
+      const id = req.params.id;
+      console.log("id :", id);
+      
+      const {updatedTitle, updatedAuthors, newYear} = req.body;
+      
+      const exist = await booksModel.findOneAndUpdate(
+        {myId:id}, 
+        {title:updatedTitle, authors:updatedAuthors, year:newYear},
+        {new: true, runValidators:true}
+      );
+      if(!exist){
+        return res.status(404).json({
+          success:false,
+          message:"Concerned book is not there"
+        })
+      }
+      console.log("exist: ", exist);
+      res.status(201).json({
+        success:true,
+        message:'book Updated',
+        updatedBook:exist
+      })
+
+    }
+    catch(e){
+      console.log("got some Err while editing ", e);
+      res.status(500).json({
+        succss:false,
+        message:"unable to Edit.. error occurred",
+        error:e.message
+      })
+    }
+  }
+
+
+  async function deleteBook(req, res){
+    try{
+      const id = req.query.id;
+      const isExist = await booksModel.findOne({id: myId});
+      console.log("is Exist; ", isExist);
+      res.status(201).json({
+        success:true,
+        message:"successfully Received the Id"
+      })
+    }catch(err){
+
+      console.log("err while fetching Id");
+      res.status(500).json({
+        success:false,
+        message:'Error Occured during Id Access', 
+        error:err.message
+      })
+    }
+  }
+
+
+export default {getAll, addBook, editBook, validateBookEdit, deleteBook}
