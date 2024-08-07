@@ -7,7 +7,7 @@ const getAll = async (req, res) => {
     try {
         
 
-      let books = await booksModel.find({}).sort({ myId: 1 });
+      let books = await booksModel.find({});
   
       if (books.length === 0) {
         console.log("Books didn't exist, fetching from API");
@@ -79,12 +79,13 @@ const addBook = async (req, res) => {
   const validateBookEdit = [
     param('id').isString().notEmpty().withMessage('Valid book ID is required'),
     body('updatedTitle').isString().notEmpty().withMessage('Title is required'),
-    body('updatedAuthors').isArray().withMessage('Authors should be an array'),
-    body('updatedAuthors.*').isString().withMessage('Each author should be a string'),
-    body('newYear').isInt({ min: 1000, max: new Date().getFullYear() }).withMessage('Valid year is required'),
+    body('updatedAuthors').isString().withMessage('Authors should be a in string format'), 
   ];
+  // body('updatedAuthors.*').isString().withMessage('Each author should be a string'),
+  // body('newYear').isInt({ min: 1000, max: new Date().getFullYear() }).withMessage('Valid year is required'),
 
   const editBook = async(req, res) => {
+    console.log("edit Book Runs: ")
     const errors = validationResult(req);
     if(!errors.isEmpty()){
       return res.status(404).json({erros:errors.array()})
@@ -97,11 +98,12 @@ const addBook = async (req, res) => {
       const id = req.params.id;
       console.log("id :", id);
       
-      const {updatedTitle, updatedAuthors, newYear} = req.body;
-      
+      const {updatedTitle, updatedAuthors} = req.body;
+      console.log("req body: ", req.body);
+      const authorsList = updatedAuthors.split(',').map(author => author.trim());
       const exist = await booksModel.findOneAndUpdate(
         {myId:id}, 
-        {title:updatedTitle, authors:updatedAuthors, year:newYear},
+        {title:updatedTitle, authors:authorsList},
         {new: true, runValidators:true}
       );
       if(!exist){
@@ -133,6 +135,7 @@ const addBook = async (req, res) => {
     try{
       const id = req.query.id;
       console.log("id after repeated errs: ", id);
+      const googleBooks = await booksModel.find({});
       const isExist = await booksModel.findOne({myId:id});
       
       if(!isExist){
@@ -146,11 +149,14 @@ const addBook = async (req, res) => {
 
 
       const del = await booksModel.deleteOne(isExist);
+      const updatedBooks = await booksModel.find({});
+      console.log("books after delete: ", updatedBooks.length)
       console.log('del ', del);
       if(del.deletedCount){
         return res.status(201).json({
           success:true,
-          message:"successfully Remove the Book"
+          message:"successfully Remove the Book",
+          books:updatedBooks
         })
       }
       else{
