@@ -12,10 +12,15 @@ app.use(cors());
 
 const Port = process.env.PORT || 3005;
 
-database().then
-(() => {
-    app.listen(Port, (() => console.log(" The NOURISHER ", Port)));
-}) .catch(err => console.error('Failed to connect to database:', err));;
+async function serverSetup(){
+    await database().then
+    (() => {
+        app.listen(Port, (() => console.log("The Opt Forgiving", Port)));
+    }) .catch(err => console.error('Failed to connect to database:', err));;
+
+}
+
+serverSetup().catch(console.error);
 
 
 app.use('/bookish/api', router);

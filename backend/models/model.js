@@ -22,7 +22,7 @@ const booksSchema = new mongoose.Schema({
         type:String
     }
 
-})
+}, {collection:'life-lessons'})
 
 booksSchema.index({myId:1},{unique:true})
 
