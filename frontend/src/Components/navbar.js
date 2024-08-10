@@ -45,7 +45,7 @@ const Navbar = () => {
                 <Motto> BoOk STore </Motto>
             </LogoParent>
             <LinksContainer>
-                <StyledLink to="/favorites" ><button>Favorites</button></StyledLink>
+                <StyledLink to="/favorites" ><button>My Favorites</button></StyledLink>
                 <StyledLink to="/"><button>HOME</button></StyledLink>
             </LinksContainer>
             
